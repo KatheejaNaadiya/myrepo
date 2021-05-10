@@ -1,0 +1,187 @@
+select * from emp;
+select ENAME, JOB from emp;
+select * from dept;
+select ENAME from emp where JOB = 'MANAGER';
+select DNAME from DEPT where LOC  = 'NEW YORK';
+select JOB, ENAME from emp;
+select * from emp where JOB = 'SALESMAN' AND deptno = '30';
+select * from emp where JOB = 'SALESMAN' OR DEPTNO = '30';
+select JOB from emp where deptno = '30';
+select * from emp order by JOB DESC;
+select * from emp order by JOB ASC;
+select DISTINCT JOB, DEPTNO from emp;
+select deptno from emp order by JOB DESC;
+
+select *from emp;
+select * from dept;
+
+select * from emp where JOB like 'MA%';
+select * from emp where DEPTNO BETWEEN 10 AND 20;
+select * from emp where SAL IN (3000,5000);
+select EMPNO,ENAME,SAL,JOB from emp WHERE ENAME = '&ENAME' OR EMPNO = '&EMPNO';
+select EMPNO,ENAME,NVL(COMM,0) from emp where rownum<5;
+select UPPER(ENAME), INITCAP(JOB) from emp where rownum<5;
+select concat(ENAME,JOB)from emp where rownum<5;
+select SUBSTR(JOB,1,5),INSTR(JOB,'r') from emp ;
+select count (*) from emp;
+select AVG(DEPTNO) AVERAGE_SAL from emp;
+select SUM(SAL) total_sal from emp;
+select MIN(HIREDATE) oldest, MAX(HIREDATE) newest from emp;
+select DEPTNO, COUNT(*) from emp GROUP BY DEPTNO;
+select DEPTNO, JOB, SUM(SAL) from emp GROUP BY DEPTNO,JOB;
+select SUM(SAL) from emp GROUP BY DEPTNO,JOB;
+select JOB,SUM(SAL) from emp GROUP BY JOB HAVING SUM(SAL) > 1000;
+select E.ENAME EMPNAME,D.DNAME DENAME from emp E NATURAL JOIN dept D;
+select E.ENAME EMPNAME,D.DNAME DENAME from emp E JOIN dept D on E.DEPTNO = D.DEPTNO;
+select E.ENAME EMPNAME,D.DNAME DENAME from emp E JOIN dept D USING (DEPTNO);
+
+SELECT EMPNO, (SYSDATE - HIREDATE) EMPLOYMENT_DAYS FROM EMP WHERE ROWNUM < 10;
+SELECT EMPNO, MONTHS_BETWEEN (SYSDATE, HIREDATE) EMPLOYMENT_MONTHS FROM EMP WHERE ROWNUM < 5;
+SELECT ENAME, NVL(COMM, '0') FROM EMP;
+SELECT NVL2(JOB, 'JOB ASSIGNED','BENCH') FROM EMP;
+SELECT NULLIF (12, 11) FROM DUAL;
+SELECT NULLIF('SUN','MOON') FROM DUAL;
+SELECT ENAME, CASE WHEN SAL < 1000 THEN 'GRADE 1'
+          WHEN SAL > 1000 AND SAL < 2000 THEN 'GRADE 2'
+          ELSE 'GRADE 3'
+          END CASE
+FROM EMP;
+SELECT COUNT(*) FROM EMP;
+SELECT TO_DATE('March 15, 1989, 11:00 A.M.', 'Month dd, YYYY, HH:MI A.M.', 'NLS_DATE_LANGUAGE = American') FROM DUAL;
+
+
+-----NATURAL JOIN---
+SELECT ENAME EMPNAME,DNAME DENAME FROM EMP NATURAL JOIN DEPT;
+
+SELECT E.ENAME EMPNAME,D.DNAME DENAME FROM EMP E JOIN DEPT D ON E.DEPTNO = D.DEPTNO;
+SELECT E.ENAME NAME,D.DNAME DNAME FROM EMP E JOIN DEPT D USING (DEPTNO);
+
+--RIGHT OUTER JOIN--
+SELECT E.ENAME, E.SAL, D.DNAME
+FROM EMP E, DEPT D
+WHERE E.DEPTNO (+) = D.DEPTNO;
+
+---LEFT OUTER JOIN
+SELECT E.ENAME, E.SAL, D.DNAME
+FROM EMP E, DEPT D
+WHERE E.DEPTNO = D.DEPTNO (+);
+
+---FULL OUTER JOIN
+SELECT NVL (E.ENAME,'-') EMPLOYEENAME, NVL (TO_CHAR (D.DNAME),'-') DEPARTMENTNAME
+FROM EMP E FULL OUTER JOIN DEPT D
+ON E.DEPTNO = D.DEPTNO;
+
+---CROSS JOIN OR CARTESIAN PROD:--
+SELECT E.ENAME, D.DNAME
+FROM EMP E, DEPT D;
+
+SELECT E.ENAME, D.DNAME
+FROM EMP E CROSS JOIN DEPT D;
+
+
+
+-----single row sub query----
+SELECT ename, sal, deptno
+FROM emp
+WHERE sal = (SELECT MIN (sal)
+FROM emp);
+---single row sub query with having clause---
+SELECT deptno, MIN (sal)
+FROM emp
+GROUP BY deptno
+HAVING MIN (sal)  < (SELECT AVG (sal)
+FROM emp);
+ ----- multiple row sub query----
+ SELECT ename, deptno
+FROM emp
+WHERE deptno IN (SELECT deptno
+                       FROM dept
+                       WHERE DNAME = 'SALES');
+ -----corelated Sub-query----
+SELECT ENAME, sal, deptno
+FROM   emp E
+WHERE sal > (SELECT AVG(sal)
+                FROM   EMP T
+                WHERE E.deptno = T.deptno);
+               
+ SELECT AVG(sal)
+                FROM   EMP
+                WHERE deptno = 10;             
+-------Multiple Column Sub Query-----
+SELECT ename, job, DEPTNO, sal
+FROM emp
+WHERE (sal, deptno) in (SELECT sal, deptno
+ FROM emp
+   WHERE sal BETWEEN 1000 and 2000
+ AND deptno BETWEEN 10 and 20)
+ORDER BY Ename;
+-------union------
+SELECT 1 NUM FROM DUAL
+UNION
+SELECT 5 FROM DUAL
+UNION
+SELECT 3 FROM DUAL
+UNION
+SELECT 6 FROM DUAL
+UNION
+SELECT 3 FROM DUAL;
+------UNION ALL--------
+SELECT 1 NUM FROM DUAL
+UNION ALL
+SELECT 5 FROM DUAL
+UNION ALL
+SELECT 3 FROM DUAL
+UNION ALL
+SELECT 6 FROM DUAL
+UNION ALL
+SELECT 3 FROM DUAL;
+
+------MINUS----
+SELECT JOB
+FROM emp
+WHERE DEPTNO = 10
+MINUS
+SELECT JOB
+FROM emp
+WHERE DEPTNO = 20;
+
+select JOB, DEPTNO from emp where DEPTNO=10;
+select JOB, DEPTNO from emp where DEPTNO=20;
+------Matching the SELECT statement-----
+SELECT DEPTNO "Dept", ENAME "Emp", NULL "Location"
+FROM emp
+UNION
+SELECT DEPTNO, NULL "Emp", LOC
+FROM dept;
+------Using ORDER BY clause in SET operations------
+SELECT empno, ename, sal
+FROM emp
+WHERE deptno=10
+UNION
+SELECT empno, ename, sal
+FROM emp
+WHERE deptno=20
+ORDER BY 3;
+----CREATE TABLE----
+CREATE TABLE EMP2
+(EMPID NUMBER,
+ENAME VARCHAR2(100),
+DEPARTMENT_ID NUMBER,
+SALARY NUMBER,
+JOB_ID VARCHAR2(3),
+HIREDATE DATE,
+COMM NUMBER);
+
+SELECT  ENAME, SALARY FROM EMP2;
+
+
+CREATE TABLE DEPARTMENT2
+(DEPARTMENT_ID NUMBER,
+   DNAME VARCHAR2 (100),
+   LOCATION_ID NUMBER DEFAULT 100);
+   
+-------CTAS - Create table using subquery----
+CREATE TABLE EMP_BACKUP2
+AS
+SELECT * FROM EMP2
+WHERE department_id=20;
